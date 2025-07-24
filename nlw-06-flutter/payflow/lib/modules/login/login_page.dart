@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:payflow/modules/login/login_controller.dart';
 import 'package:payflow/shared/themes/app_colors.dart';
 import 'package:payflow/shared/themes/app_images.dart';
 import 'package:payflow/shared/themes/app_text_styles.dart';
@@ -13,6 +16,26 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late final LoginController _loginController;
+
+  @override
+  void initState() {
+    super.initState();
+    _loginController = LoginController(
+      onShowMessage: (message, color) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: color,
+              duration: Duration(seconds: color == Colors.red ? 5 : 3),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -65,9 +88,10 @@ class _LoginPageState extends State<LoginPage> {
                       top: 50,
                     ),
                     child: SocialLoginButton(
-                      onTap: () {
-                        // ignore: avoid_print
-                        print("clicou");
+                      onTap: () async {
+                        // Passa o context para o controller antes do login
+                        _loginController.setContext(context);
+                        await _loginController.googleSignIn();
                       },
                     ),
                   ),
